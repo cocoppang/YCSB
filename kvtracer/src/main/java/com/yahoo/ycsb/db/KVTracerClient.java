@@ -23,6 +23,7 @@ import com.yahoo.ycsb.ByteArrayByteIterator;
 import com.yahoo.ycsb.ByteIterator;
 import com.yahoo.ycsb.DB;
 import com.yahoo.ycsb.DBException;
+import com.yahoo.ycsb.Status;
 
 /**
  * A database interface layer for generating key-value workload traces
@@ -171,7 +172,7 @@ public class KVTracerClient extends DB {
   }
 
 	@Override
-	public int read(String table, String key, Set<String> fields, HashMap<String, ByteIterator> result) {
+	public Status read(String table, String key, Set<String> fields, HashMap<String, ByteIterator> result) {
     try {
       if (fields != null) {
         for (String field:fields) {
@@ -187,21 +188,21 @@ public class KVTracerClient extends DB {
           }
         }
       }
-      return OK;
+      return Status.OK;
     } catch (IOException exception) {
       exception.printStackTrace();
-      return ERROR;
+      return Status.ERROR;
     }
 	}
 
 	@Override
-	public int scan(String table, String startkey, int recordcount, Set<String> fields, Vector<HashMap<String, ByteIterator>> result) {
+	public Status scan(String table, String startkey, int recordcount, Set<String> fields, Vector<HashMap<String, ByteIterator>> result) {
 		System.err.println("scan operation is not supported");
-		return ERROR;
+		return Status.ERROR;
 	}
 
 	@Override
-	public int update(String table, String key, HashMap<String, ByteIterator> values) {
+	public Status update(String table, String key, HashMap<String, ByteIterator> values) {
     try {
       for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
         String prefix = encodeKey(table, key, "");
@@ -215,25 +216,25 @@ public class KVTracerClient extends DB {
         String value = entry.getValue().toString();
         mOpWriter.write("UPDATE|" + encKey + "|" + value + "\n");
       }
-		  return OK;
+		  return Status.OK;
     } catch (IOException exception) {
       exception.printStackTrace();
-      return ERROR;
+      return Status.ERROR;
     }
 	}
 
 	@Override
-	public int insert(String table, String key, HashMap<String, ByteIterator> values) {
+	public Status insert(String table, String key, HashMap<String, ByteIterator> values) {
 		return update(table, key, values);
 	}
 
 	@Override
-	public int delete(String table, String key) {
+	public Status delete(String table, String key) {
     String prefix = encodeKey(table, key, "");
     HashSet<String> keys = mKeyMap.get(prefix);
     if (keys == null) {
       System.err.println("no keys to delete for <" + table + "," + key + ">");
-      return ERROR;
+      return Status.ERROR;
     }
     try {
       for (String k:keys) {
@@ -242,8 +243,8 @@ public class KVTracerClient extends DB {
       }
     } catch (IOException exception) {
       exception.printStackTrace();
-      return ERROR;
+      return Status.ERROR;
     }
-		return OK;
+		return Status.OK;
 	}
 }
