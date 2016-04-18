@@ -43,10 +43,4 @@
     </plugins>
   </build>
 
-  <repositories>
-  <repository>
-  <id>central</id>
-  <url>file:///Users/michi/.m2/repository</url>
-  </repository>
-  </repositories>
 </project>
