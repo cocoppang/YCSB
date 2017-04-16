@@ -20,6 +20,11 @@ Yahoo! Cloud System Benchmark (YCSB)
 ====================================
 [![Build Status](https://travis-ci.org/brianfrankcooper/YCSB.png?branch=master)](https://travis-ci.org/brianfrankcooper/YCSB)
 
+What's New
+----------
+This branch includes a YCSB client, `kvtracer` that can record workload operations into a trace
+file to be used by other tools. Checkout the `kvtracer` directory to see more details.
+
 Links
 -----
 http://wiki.github.com/brianfrankcooper/YCSB/  
