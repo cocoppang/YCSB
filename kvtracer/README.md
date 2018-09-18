@@ -42,3 +42,9 @@ We need to know what exactly are these keys.
 The final traces are in `tracea_load.txt` (for loading data) and `tracea_run.txt` 
 (for operations). You can merge them into one trace.
 
+
+# thkim
+In order to install YCSB, java should be installed in your machine.
+
+$> sudo apt-get install maven default-jre default-jdk
+
