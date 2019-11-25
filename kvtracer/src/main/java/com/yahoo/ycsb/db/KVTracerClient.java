@@ -30,6 +30,7 @@ import com.yahoo.ycsb.Status;
  */
 public class KVTracerClient extends DB {
 	
+	public static int count = 1;
 	public static final int OK = 0;
 	public static final int ERROR = -1;
   public static final String SEP = ":";
@@ -86,6 +87,12 @@ public class KVTracerClient extends DB {
       } else {
           throw new DBException("kvtracer.keymapfile is not set");
       }
+
+      mOpWriter.write("PRAGMA temp_store = 0;\n");
+      mOpWriter.write("PRAGMA synchronous= 2;\n");
+      mOpWriter.write("PRAGMA journal_mode = MEMORY;\n");
+      mOpWriter.write("CREATE TABLE `Person` (`ID`    INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,    `Name`  INTEGER NOT NULL,    `Birthday`  TEXT);\n");
+
     } catch (IOException exception) {
       throw new DBException(exception);
     }
@@ -180,7 +187,7 @@ public class KVTracerClient extends DB {
         for (String field:fields) {
           String encKey = encodeKey(table, key, field);
           //mOpWriter.write("GET|" + encKey + "\n");
-          mOpWriter.write("GET " + encKey + "\n");
+          mOpWriter.write("SELECT Birthday FROM Person WHERE Name = \'" + encKey + "\'\n");
         }
       } else {
         String prefix = encodeKey(table, key, "");
@@ -218,8 +225,8 @@ public class KVTracerClient extends DB {
         }
         keys.add(encKey);
         String value = entry.getValue().toString();
-        //mOpWriter.write("UPDATE|" + encKey + "|" + value + "\n");
-        mOpWriter.write("SET " + encKey + " " + value + "\n");
+        mOpWriter.write("UPDATE Person SET Birthday ='aaaaaaaaaaa' WHERE Name = "+ "\'" + encKey + "\';\n");
+		count++;
       }
 		  return Status.OK;
     } catch (IOException exception) {
@@ -230,7 +237,27 @@ public class KVTracerClient extends DB {
 
 	@Override
 	public Status insert(String table, String key, HashMap<String, ByteIterator> values) {
-		return update(table, key, values);
+    try {
+      for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
+        String prefix = encodeKey(table, key, "");
+        String encKey = encodeKey(table, key, entry.getKey());
+        HashSet<String> keys = mKeyMap.get(prefix);
+        if (keys == null) {
+          keys = new HashSet<String>();
+          mKeyMap.put(prefix, keys);
+        }
+        keys.add(encKey);
+        String value = entry.getValue().toString();
+        //mOpWriter.write("UPDATE|" + encKey + "|" + value + "\n");
+        mOpWriter.write("INSERT INTO Person (ID, Name, Birthday) VALUES (" + count + ", " + encKey + ", \'" + value + "\');\n");
+		count++;
+      }
+		  return Status.OK;
+    } catch (IOException exception) {
+      exception.printStackTrace();
+      return Status.ERROR;
+    }
+	//	return update(table, key, values);
 	}
 
 	@Override
