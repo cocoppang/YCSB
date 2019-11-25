@@ -20,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Iterator;
+import java.util.Random;
 
 /**
  * YCSB-specific buffer class.  ByteIterators are designed to support
@@ -53,6 +54,23 @@ public abstract class ByteIterator implements Iterator<Byte> {
   public Byte next() {
     throw new UnsupportedOperationException();
   }
+
+    // AN= AlphaNumeric
+    // Returns an random integer that lays in the following ranges:
+    // 48-57, 65-90, 97-122
+    // Converting this to Ascii or UTF-8 leads to something in A-Za-z0-9
+    protected int getRandAN() {
+        int randomNumber = 0;
+        Random rand = new Random();
+        while (randomNumber < 48 ||
+                (randomNumber > 57 && randomNumber < 65) ||
+                (randomNumber > 90 && randomNumber < 97) ||
+                randomNumber > 122) {
+            randomNumber = rand.nextInt((122 - 48) + 1) + 48;
+        }
+        return randomNumber;
+    }
+
 
   public abstract byte nextByte();
 

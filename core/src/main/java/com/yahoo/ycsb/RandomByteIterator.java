@@ -30,26 +30,44 @@ public class RandomByteIterator extends ByteIterator {
     return (off + bufOff) < len;
   }
 
-  private void fillBytesImpl(byte[] buffer, int base) {
-    int bytes = Utils.random().nextInt();
+//  private void fillBytesImpl(byte[] buffer, int base) {
+//    int bytes = Utils.random().nextInt();
+//
+//    switch (buffer.length - base) {
+//    default:
+//      buffer[base + 5] = (byte) (((bytes >> 25) & 95) + ' ');
+//    case 5:
+//      buffer[base + 4] = (byte) (((bytes >> 20) & 63) + ' ');
+//    case 4:
+//      buffer[base + 3] = (byte) (((bytes >> 15) & 31) + ' ');
+//    case 3:
+//      buffer[base + 2] = (byte) (((bytes >> 10) & 95) + ' ');
+//    case 2:
+//      buffer[base + 1] = (byte) (((bytes >> 5) & 63) + ' ');
+//    case 1:
+//      buffer[base + 0] = (byte) (((bytes) & 31) + ' ');
+//    case 0:
+//      break;
+//    }
+//  }
+//
+//
 
-    switch (buffer.length - base) {
-    default:
-      buffer[base + 5] = (byte) (((bytes >> 25) & 95) + ' ');
-    case 5:
-      buffer[base + 4] = (byte) (((bytes >> 20) & 63) + ' ');
-    case 4:
-      buffer[base + 3] = (byte) (((bytes >> 15) & 31) + ' ');
-    case 3:
-      buffer[base + 2] = (byte) (((bytes >> 10) & 95) + ' ');
-    case 2:
-      buffer[base + 1] = (byte) (((bytes >> 5) & 63) + ' ');
-    case 1:
-      buffer[base + 0] = (byte) (((bytes) & 31) + ' ');
-    case 0:
-      break;
-    }
+  private void fillBytesImpl(byte[] buffer, int base) {
+	  // we need A-Za-z0-9, which convertes to the range (Ascii/UTF-8):
+	  // 0-9 48-57
+	  // A-Z 65-90
+	  // a-z 97-122
+	  try {
+		  buffer[base + 0] = (byte) this.getRandAN();
+		  buffer[base + 1] = (byte) this.getRandAN();
+		  buffer[base + 2] = (byte) this.getRandAN();
+		  buffer[base + 3] = (byte) this.getRandAN();
+		  buffer[base + 4] = (byte) this.getRandAN();
+		  buffer[base + 5] = (byte) this.getRandAN();
+	  } catch (ArrayIndexOutOfBoundsException e) { /* ignore it */ }
   }
+
 
   private void fillBytes() {
     if (bufOff == buf.length) {
